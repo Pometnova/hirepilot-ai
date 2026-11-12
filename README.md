@@ -1,6 +1,14 @@
 # HirePilot AI
 
-**A recruiting assistant: ask a question in plain English, and an AI agent answers it from fixed, tested tools over a cleaned recruiting dataset — Python does the calculations, the model explains.**
+HirePilot AI is a recruiting assistant that helps recruiters find the right candidates, identify hiring delays, and keep track of pending tasks. Recruiters can ask questions in plain English and get answers based on real data. Python handles the calculations, while AI analyzes the results and explains them in a clear, easy-to-understand way.
+
+**What's inside**
+
+- **Data** — the ATS export, mailbox and CVs cleaned into SQLite. 57 data issues found: 34 fixed automatically, 7 flagged for a recruiter to review, 16 documented and left as they are ([details](docs/DATA_AUDIT.md)).
+- **MCP server** — 8 fixed tools with clear inputs; the model never writes SQL.
+- **Agent** — Claude calls the tools and answers with facts, its assessment and caveats kept separate, plus a source for every fact.
+- **Two interfaces** — a Streamlit web app (dashboard + chat) and a Slack bot, both using the same agent.
+- **Checked** — 390 automated tests against the raw data, and a 14-question eval set run on the real model (13/14 pass).
 
 ![Recruiting Overview page](docs/images/overview.png)
 
