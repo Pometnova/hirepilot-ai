@@ -1,0 +1,24 @@
+# secrets
+.env
+
+# Python
+__pycache__/
+.venv/
+
+# macOS
+.DS_Store
+
+# dataset content: not published. Put the dataset bundle in data/raw/ yourself (see data/README.md)
+data/raw/
+data/*.db
+data/*.sqlite
+data/processed/
+
+# any SQLite file
+*.db
+
+# private working notes
+notes/
+
+# local assistant instructions (kept on my machine, not published)
+CLAUDE.md

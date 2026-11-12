@@ -1,0 +1,32 @@
+# Slack app manifest for HirePilot AI. Paste it in: api.slack.com/apps > Create New App > Paste a manifest.
+# Minimum scopes. Socket Mode is on, so no public URL is needed.
+display_information:
+  name: HirePilot
+  description: Recruiting assistant over the Quillfeather Labs demo data
+  background_color: "#2c3e50"
+features:
+  app_home:
+    home_tab_enabled: false
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: HirePilot
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read   # see @HirePilot mentions in channels
+      - chat:write          # post and edit the answer
+      - im:history          # read direct messages and DM threads
+      - channels:history    # read the earlier messages of a thread in a public channel
+      - groups:history      # same, for a private channel the bot was invited to
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

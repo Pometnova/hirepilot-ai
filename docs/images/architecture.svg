@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 840" width="1900" height="840" role="img" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"><rect width="1900" height="840" fill="#FAF9F8"/>
+<text x="40" y="52" font-size="30" font-weight="700" fill="#201936" text-anchor="start">HirePilot architecture</text>
+<text x="40" y="82" font-size="14.5" font-weight="400" fill="#777384" text-anchor="start">A recruiting assistant over the Quillfeather Labs dataset. The data is cleaned once into SQLite. At question time an agent</text>
+<text x="40" y="103" font-size="14.5" font-weight="400" fill="#777384" text-anchor="start">calls eight fixed tools, and Python does the calculations while the model explains.</text>
+<rect x="40" y="128" width="16" height="16" rx="4" fill="#2F9E6E"/><text x="64" y="141" font-size="13" font-weight="500" fill="#201936" text-anchor="start">Data</text>
+<rect x="128.4" y="128" width="16" height="16" rx="4" fill="#3A6FD0"/><text x="152.4" y="141" font-size="13" font-weight="500" fill="#201936" text-anchor="start">Code and logic</text>
+<rect x="292.79999999999995" y="128" width="16" height="16" rx="4" fill="#E8553D"/><text x="316.79999999999995" y="141" font-size="13" font-weight="500" fill="#201936" text-anchor="start">AI</text>
+<rect x="365.99999999999994" y="128" width="16" height="16" rx="4" fill="#6B54A3"/><text x="389.99999999999994" y="141" font-size="13" font-weight="500" fill="#201936" text-anchor="start">User interface</text>
+<rect x="530.3999999999999" y="128" width="16" height="16" rx="4" fill="#7A7790"/><text x="554.3999999999999" y="141" font-size="13" font-weight="500" fill="#201936" text-anchor="start">Checks</text>
+<line x1="633.9999999999999" y1="136" x2="667.9999999999999" y2="136" stroke="#5A5470" stroke-width="2"/>
+<text x="677.9999999999999" y="141" font-size="12.5" font-weight="400" fill="#777384" text-anchor="start">data flow</text>
+<line x1="763.9999999999999" y1="136" x2="797.9999999999999" y2="136" stroke="#5A5470" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="807.9999999999999" y="141" font-size="12.5" font-weight="400" fill="#777384" text-anchor="start">optional path or check</text>
+<rect x="40" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M40,330 L40,301 Q40,290 51,290 L234,290 Q245,290 245,301 L245,330 Z" fill="#2F9E6E"/>
+<text x="54" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Raw files</text>
+<text x="54" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">data/raw/ (read only)</text>
+<text x="54" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">candidates.json</text>
+<text x="54" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">applications.json</text>
+<text x="54" y="414" font-size="12" font-weight="400" fill="#201936" text-anchor="start">jobs.json</text>
+<text x="54" y="433" font-size="12" font-weight="400" fill="#201936" text-anchor="start">scorecards.json</text>
+<text x="54" y="452" font-size="12" font-weight="400" fill="#201936" text-anchor="start">activity.json</text>
+<text x="54" y="471" font-size="12" font-weight="400" fill="#201936" text-anchor="start">stage_events.csv</text>
+<text x="54" y="490" font-size="12" font-weight="400" fill="#201936" text-anchor="start">emails/*.eml</text>
+<text x="54" y="509" font-size="12" font-weight="400" fill="#201936" text-anchor="start">cvs/ (CV files)</text>
+<text x="54" y="528" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="54" y="547" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Never modified.</text>
+<text x="54" y="566" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Not in this repository.</text>
+<rect x="305" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M305,330 L305,301 Q305,290 316,290 L499,290 Q510,290 510,301 L510,330 Z" fill="#3A6FD0"/>
+<text x="319" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Loader and cleaning</text>
+<text x="319" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">backend/ingest/</text>
+<text x="319" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Normalises dates and</text>
+<text x="319" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">stage names.</text>
+<text x="319" y="414" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Links emails and CVs to</text>
+<text x="319" y="433" font-size="12" font-weight="400" fill="#201936" text-anchor="start">candidates by inference and</text>
+<text x="319" y="452" font-size="12" font-weight="400" fill="#201936" text-anchor="start">records method and</text>
+<text x="319" y="471" font-size="12" font-weight="400" fill="#201936" text-anchor="start">confidence of each link.</text>
+<text x="319" y="490" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="319" y="509" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Every doubtful value gets</text>
+<text x="319" y="528" font-size="12" font-weight="400" fill="#201936" text-anchor="start">a row in the data-issues</text>
+<text x="319" y="547" font-size="12" font-weight="400" fill="#201936" text-anchor="start">audit (docs/DATA_AUDIT.md).</text>
+<rect x="570" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M570,330 L570,301 Q570,290 581,290 L764,290 Q775,290 775,301 L775,330 Z" fill="#2F9E6E"/>
+<text x="584" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">SQLite</text>
+<text x="584" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">data/hirepilot.db</text>
+<text x="584" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">16 tables.</text>
+<text x="584" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Built once, then opened</text>
+<text x="584" y="414" font-size="12" font-weight="400" fill="#201936" text-anchor="start">read-only.</text>
+<text x="584" y="433" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="584" y="452" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Every row keeps its</text>
+<text x="584" y="471" font-size="12" font-weight="400" fill="#201936" text-anchor="start">source file and record id.</text>
+<text x="584" y="490" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="584" y="509" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Includes the data_issues</text>
+<text x="584" y="528" font-size="12" font-weight="400" fill="#201936" text-anchor="start">table (the audit).</text>
+<rect x="835" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M835,330 L835,301 Q835,290 846,290 L1029,290 Q1040,290 1040,301 L1040,330 Z" fill="#3A6FD0"/>
+<text x="849" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Services</text>
+<text x="849" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">backend/services/</text>
+<text x="849" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">All business logic:</text>
+<text x="849" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">ranking, funnel, tasks,</text>
+<text x="849" y="414" font-size="12" font-weight="400" fill="#201936" text-anchor="start">data issues, risk flags.</text>
+<text x="849" y="433" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="849" y="452" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Python does the</text>
+<text x="849" y="471" font-size="12" font-weight="400" fill="#201936" text-anchor="start">calculations, filtering</text>
+<text x="849" y="490" font-size="12" font-weight="400" fill="#201936" text-anchor="start">and dates.</text>
+<text x="849" y="509" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="849" y="528" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Fixed reference date</text>
+<text x="849" y="547" font-size="12" font-weight="400" fill="#201936" text-anchor="start">2026-10-15.</text>
+<rect x="1100" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M1100,330 L1100,301 Q1100,290 1111,290 L1294,290 Q1305,290 1305,301 L1305,330 Z" fill="#3A6FD0"/>
+<text x="1114" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">MCP server</text>
+<text x="1114" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">backend/mcp_server.py</text>
+<text x="1114" y="376" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">8 fixed tools (stdio):</text>
+<text x="1114" y="395" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">list_jobs</text>
+<text x="1114" y="414" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">get_job</text>
+<text x="1114" y="433" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">list_candidates_for_job</text>
+<text x="1114" y="452" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">get_candidate_profile</text>
+<text x="1114" y="471" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">rank_candidates_for_job</text>
+<text x="1114" y="490" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">get_funnel</text>
+<text x="1114" y="509" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">list_tasks</text>
+<text x="1114" y="528" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">get_data_issues</text>
+<text x="1114" y="547" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace"></text>
+<text x="1114" y="566" font-size="11.5" font-weight="400" fill="#201936" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">Thin wrapper. No free SQL.</text>
+<rect x="1365" y="290" width="205" height="330" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M1365,330 L1365,301 Q1365,290 1376,290 L1559,290 Q1570,290 1570,301 L1570,330 Z" fill="#E8553D"/>
+<text x="1379" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Agent core</text>
+<text x="1379" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">backend/agent/</text>
+<text x="1379" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">MCP client + Claude API.</text>
+<text x="1379" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Starts the server as a</text>
+<text x="1379" y="414" font-size="12" font-weight="400" fill="#201936" text-anchor="start">subprocess, lists the tools,</text>
+<text x="1379" y="433" font-size="12" font-weight="400" fill="#201936" text-anchor="start">runs the tool calls.</text>
+<text x="1379" y="452" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="1379" y="471" font-size="12" font-weight="400" fill="#201936" text-anchor="start">The model explains:</text>
+<text x="1379" y="490" font-size="12" font-weight="400" fill="#201936" text-anchor="start">FACTS, AI ASSESSMENT,</text>
+<text x="1379" y="509" font-size="12" font-weight="400" fill="#201936" text-anchor="start">CAVEATS, sources.</text>
+<text x="1379" y="528" font-size="12" font-weight="400" fill="#201936" text-anchor="start"></text>
+<text x="1379" y="547" font-size="12" font-weight="400" fill="#201936" text-anchor="start">The model never writes SQL.</text>
+<rect x="1630" y="290" width="205" height="155" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M1630,330 L1630,301 Q1630,290 1641,290 L1824,290 Q1835,290 1835,301 L1835,330 Z" fill="#6B54A3"/>
+<text x="1644" y="315" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Streamlit web app</text>
+<text x="1644" y="352" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">web/app.py</text>
+<text x="1644" y="376" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Overview, Candidates,</text>
+<text x="1644" y="395" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Tasks, Ask AI.</text>
+<rect x="1630" y="465" width="205" height="155" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M1630,505 L1630,476 Q1630,465 1641,465 L1824,465 Q1835,465 1835,476 L1835,505 Z" fill="#6B54A3"/>
+<text x="1644" y="490" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Slack bot</text>
+<text x="1644" y="527" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">slack/bot.py</text>
+<text x="1644" y="551" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Socket Mode.</text>
+<text x="1644" y="570" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Same agent, answers</text>
+<text x="1644" y="589" font-size="12" font-weight="400" fill="#201936" text-anchor="start">in a thread.</text>
+<rect x="1365" y="196" width="205" height="52" rx="12" fill="#FFFFFF" stroke="#E8553D" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="1379" y="221" font-size="15" font-weight="700" fill="#E8553D" text-anchor="start">Claude API</text>
+<line x1="248" y1="440" x2="302" y2="440" stroke="#5A5470" stroke-width="2"/><polygon points="302,440 293.9,443.9 293.9,436.1" fill="#5A5470"/><text x="275.0" y="431" font-size="11" font-weight="500" fill="#777384" text-anchor="middle">cleans</text>
+<line x1="513" y1="440" x2="567" y2="440" stroke="#5A5470" stroke-width="2"/><polygon points="567,440 558.9,443.9 558.9,436.1" fill="#5A5470"/><text x="540.0" y="431" font-size="11" font-weight="500" fill="#777384" text-anchor="middle">writes</text>
+<line x1="778" y1="440" x2="832" y2="440" stroke="#5A5470" stroke-width="2"/><polygon points="832,440 823.9,443.9 823.9,436.1" fill="#5A5470"/><text x="805.0" y="431" font-size="11" font-weight="500" fill="#777384" text-anchor="middle">reads</text>
+<line x1="1043" y1="440" x2="1097" y2="440" stroke="#5A5470" stroke-width="2"/><polygon points="1097,440 1088.9,443.9 1088.9,436.1" fill="#5A5470"/><text x="1070.0" y="431" font-size="11" font-weight="500" fill="#777384" text-anchor="middle">calls</text>
+<line x1="1308" y1="440" x2="1362" y2="440" stroke="#5A5470" stroke-width="2"/><polygon points="1362,440 1353.9,443.9 1353.9,436.1" fill="#5A5470"/><text x="1335.0" y="431" font-size="11" font-weight="500" fill="#777384" text-anchor="middle">stdio</text>
+<line x1="1573" y1="440" x2="1600.0" y2="440" stroke="#5A5470" stroke-width="2"/>
+<line x1="1600.0" y1="368" x2="1600.0" y2="543" stroke="#5A5470" stroke-width="2"/>
+<line x1="1600.0" y1="368" x2="1627" y2="368" stroke="#5A5470" stroke-width="2"/><polygon points="1627,368 1618.9,371.9 1618.9,364.1" fill="#5A5470"/>
+<line x1="1600.0" y1="543" x2="1627" y2="543" stroke="#5A5470" stroke-width="2"/><polygon points="1627,543 1618.9,546.9 1618.9,539.1" fill="#5A5470"/>
+<line x1="1467.5" y1="251" x2="1467.5" y2="287" stroke="#5A5470" stroke-width="2"/><polygon points="1467.5,287 1463.6,278.9 1471.4,278.9" fill="#5A5470"/><polygon points="1467.5,251 1471.4,259.1 1463.6,259.1" fill="#5A5470"/>
+<text x="1481.5" y="275" font-size="11" font-weight="500" fill="#777384" text-anchor="start">tool-use loop</text>
+<polyline points="937.5,287 937.5,172 1732.5,172 1732.5,287" fill="none" stroke="#5A5470" stroke-width="2" stroke-dasharray="6 4"/>
+<polygon points="1732.5,289 1727.5,279 1737.5,279" fill="#5A5470"/>
+<text x="1131.25" y="164" font-size="11.5" font-weight="500" fill="#777384" text-anchor="middle">dashboard numbers: the web pages call the services directly, no AI call</text>
+<rect x="305" y="676" width="1000" height="118" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M305,716 L305,687 Q305,676 316,676 L1294,676 Q1305,676 1305,687 L1305,716 Z" fill="#7A7790"/>
+<text x="319" y="701" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">pytest tests</text>
+<text x="319" y="738" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">tests/</text>
+<text x="319" y="762" font-size="12" font-weight="400" fill="#201936" text-anchor="start">Run without the API key (a fake agent replaces Claude). Check the loader, the services, the 8 MCP tools,</text>
+<text x="319" y="781" font-size="12" font-weight="400" fill="#201936" text-anchor="start">the web pages and the Slack bot against the raw files.</text>
+<rect x="1365" y="676" width="470" height="118" rx="12" fill="#FFFFFF" stroke="#D9D2E6" stroke-width="1.2"/>
+<path d="M1365,716 L1365,687 Q1365,676 1376,676 L1824,676 Q1835,676 1835,687 L1835,716 Z" fill="#7A7790"/>
+<text x="1379" y="701" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">Eval set</text>
+<text x="1379" y="738" font-size="11.5" font-weight="500" fill="#777384" text-anchor="start" font-family="ui-monospace, Menlo, Consolas, monospace">evals/</text>
+<text x="1379" y="762" font-size="12" font-weight="400" fill="#201936" text-anchor="start">14 questions with hand-checked facts,</text>
+<text x="1379" y="781" font-size="12" font-weight="400" fill="#201936" text-anchor="start">run against the real agent (paid, on request).</text>
+<line x1="407.5" y1="675" x2="407.5" y2="623" stroke="#8E87A3" stroke-width="1.8" stroke-dasharray="5 4"/>
+<line x1="937.5" y1="675" x2="937.5" y2="623" stroke="#8E87A3" stroke-width="1.8" stroke-dasharray="5 4"/>
+<line x1="1202.5" y1="675" x2="1202.5" y2="623" stroke="#8E87A3" stroke-width="1.8" stroke-dasharray="5 4"/>
+<line x1="1467.5" y1="675" x2="1467.5" y2="623" stroke="#8E87A3" stroke-width="1.8" stroke-dasharray="5 4"/>
+</svg>

@@ -1,0 +1,24 @@
+# Run from the project root:  .venv/bin/streamlit run web/app.py
+[client]
+showErrorDetails = "none"      # never show Python tracebacks in the browser (default is "full")
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false       # no usage statistics: this app shows recruiting data
+
+[server]
+address = "localhost"          # local demo only; there is no login
+enableStaticServing = true     # serves web/static/ (the bundled Inter font) at /app/static/
+
+[theme]
+base = "light"
+primaryColor = "#FF674C"
+backgroundColor = "#FAF9F8"
+secondaryBackgroundColor = "#F1EDF7"
+textColor = "#201936"
+font = "sans serif"
+
+[theme.sidebar]
+backgroundColor = "#1A0B3F"
+secondaryBackgroundColor = "#2A1A55"
+textColor = "#E7E1F4"

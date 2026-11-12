@@ -1,0 +1,144 @@
+# Eval questions for HirePilot AI. 14 questions, deterministic checks only (no LLM judge).
+#
+# Facts that depend on the data (names, scores, numbers, task owners) are NOT written here.
+# They come from evals/build_expected.py, which reads data/raw/ only (not the DB, not the services).
+#
+# verified_by:
+#   hand               = the author compared the expected facts with the raw files by hand (Q1, Q2, Q3, Q8, Q9)
+#   independent script = checked only by build_expected.py (a second calculation from the raw files)
+#
+# Check levels:
+#   hard (default) = tool called, required names / ids / numbers / dates, forbidden claims. A miss makes the question FAIL.
+#   soft           = the WORDING of an interpretation (for example "likely a data error", "does not decline", "contact Rafael").
+#                    A miss is a WARN: "read this answer by hand". It does not fail the question.
+#
+# Every question also gets two checks automatically: status is "ok", and the style checker is clean
+# (no internal ids, no closing offers, no "I did not check").
+
+- id: q01_top3_backend
+  verified_by: hand
+  question: "Who are the top 3 candidates for the Senior Backend Engineer role, and why?"
+  checks:
+    - {check: tool_called, tool: rank_candidates_for_job}
+    - {check: top_names_in_order, job: j-backend, n: 3}
+    - {check: top_scores_shown, job: j-backend, n: 3, tolerance: 0.5}
+    - {check: includes, any: ["requirement", "fit to the role", "fit for the role", "role fit"], name: "says fit to the role is not measured", level: soft}
+
+- id: q02_funnel_backend
+  verified_by: hand
+  question: "The Senior Backend Engineer role has been open for 4 months. Where is our process losing candidates?"
+  checks:
+    - {check: tool_called, tool: get_funnel}
+    - {check: funnel_numbers, job: j-backend}
+    - {check: line_has_numbers, line_contains: "Take-Home", numbers: [11, 1], name: "Take-Home: 11 entered, 1 rejected (a-116 chain rule)"}
+
+- id: q03_tasks_pending_overdue
+  verified_by: hand
+  question: "Which tasks are pending or overdue?"
+  checks:
+    - {check: tool_called, tool: list_tasks}
+    - {check: names_present, group: task_owners}
+    - {check: no_claim, word: overdue, subjects_from: tasks_not_overdue, name: "no wrong 'overdue' (due today, pending, no due date)"}
+    - {check: includes, any: ["assum"], name: "says some due dates are assumptions", level: soft}
+
+- id: q04_top3_csm
+  verified_by: independent script
+  question: "Who are the top 3 candidates for the Customer Success Manager role, and why?"
+  checks:
+    - {check: tool_called, tool: rank_candidates_for_job}
+    - {check: top_names_in_order, job: j-csm, n: 3}
+    - {check: top_scores_shown, job: j-csm, n: 3, tolerance: 0.5}
+    - {check: includes, any: ["requirement", "fit to the role", "fit for the role", "role fit"], name: "says fit to the role is not measured", level: soft}
+
+- id: q05_top3_designer
+  verified_by: independent script
+  question: "Who are the top 3 candidates for the Product Designer role, and why?"
+  checks:
+    - {check: tool_called, tool: rank_candidates_for_job}
+    - {check: top_names_in_order, job: j-designer, n: 3}
+    - {check: top_scores_shown, job: j-designer, n: 3, tolerance: 0.5}
+    - {check: includes, any: ["requirement", "fit to the role", "fit for the role", "role fit"], name: "says fit to the role is not measured", level: soft}
+
+- id: q06_funnel_csm
+  verified_by: independent script
+  question: "Where is our process losing candidates for the Customer Success Manager role?"
+  checks:
+    - {check: tool_called, tool: get_funnel}
+    - {check: funnel_numbers, job: j-csm}
+
+- id: q07_funnel_designer
+  verified_by: independent script
+  question: "Where is our process losing candidates for the Product Designer role?"
+  checks:
+    - {check: tool_called, tool: get_funnel}
+    - {check: funnel_numbers, job: j-designer}
+
+- id: q08_tasks_due_today
+  verified_by: hand
+  question: "Which tasks are due today?"
+  checks:
+    - {check: tool_called, tool: list_tasks}
+    - {check: includes, all: ["Julian Ferreira"]}
+    - {check: no_claim, word: "due today", subjects_from: tasks_not_due_today, name: "only one task is due today"}
+
+- id: q09_a120_overdue
+  verified_by: hand
+  question: "Is the task for application a-120 overdue?"
+  checks:
+    - {check: tool_called, tool: list_tasks}
+    - {check: includes_regex, pattern: "no (set )?(due date|deadline)|without a (due date|deadline)|no due", name: "says it has no due date"}
+    - {check: no_claim, word: overdue, subjects: ["a-120", "Lucy Fairbanks"], name: "does not call a-120 overdue"}
+
+- id: q10_profile_jonah
+  verified_by: independent script
+  question: "Tell me about Jonah Whitfield."
+  checks:
+    - {check: tool_called, tool: get_candidate_profile}
+    - {check: includes, all: ["Customer Success Manager", "Senior Backend Engineer"], name: "both applications named"}
+    - {check: includes, any: ["same person", "two records", "two profiles", "duplicate", "two candidate records"], name: "says it is one person with two records", level: soft}
+    - {check: includes, any: ["reject"], name: "CSM application rejected"}
+    - {check: includes, any: ["Offer"], name: "backend application at Offer"}
+    - {check: excludes_regex, pattern: "(?<!not )two different people", name: "does not call them two people"}
+
+- id: q11_no_feedback_ravi
+  verified_by: independent script
+  question: "How is Ravi Subramanian doing in the Senior Backend Engineer process?"
+  checks:
+    - {check: tool_called, any: [get_candidate_profile, rank_candidates_for_job]}
+    - {check: includes, all: ["Ravi Subramanian", "Recruiter Call"]}
+    - {check: includes, any: ["no feedback yet", "no feedback", "no scorecard", "no interview feedback", "not been submitted", "no submitted"], name: "says no feedback yet"}
+    - {check: excludes_regex, pattern: "(?<!not )(?<!n't )(?<!no )\\b(poor(ly)?|weak|negative feedback|low score|scored (0|zero))", name: "no feedback is not called negative"}
+
+- id: q12_unknown_role
+  verified_by: independent script
+  question: "Who are the top 3 candidates for the Head of Quantum Marketing role?"
+  checks:
+    - {check: tool_called, tool: list_jobs}
+    - {check: includes_regex, pattern: "does not exist|doesn't exist|no (such )?(role|job|opening|position)|has no .{0,60}(job|role|opening|position)|isn't in the data|is not in the data|not in the data|not (find|found)|couldn't find|could not find|not one of|isn't (a|an|one)|not an open", name: "says the role does not exist", level: soft}
+    - {check: no_candidate_names, name: "names no candidate (no guessing)"}
+
+- id: q13_two_maya_chens
+  verified_by: independent script
+  question: "Tell me about Maya Chen."
+  checks:
+    - {check: tool_called, tool: get_candidate_profile}
+    - {check: includes_regex, pattern: "(?s)(?=.*Senior Backend Engineer)(?=.*Product Designer)|which (one|maya)", name: "shows both people, or asks which one"}
+    - {check: excludes_regex, pattern: "\\b(are|is|likely|probably|might be|may be|could be|appears to be|seems to be) (the )?same (person|candidate)", name: "never merges them"}
+
+- id: q14_rejected_with_offer_deadline
+  verified_by: independent script
+  question: "Is Rafael Mendoza's offer still open?"
+  checks:
+    - {check: tool_called, any: [get_candidate_profile, get_data_issues]}
+    - {check: includes, any: ["rejected"], name: "says the application is marked rejected"}
+    - {check: includes, any: ["2026-10-20", "October 20", "Oct 20", "Oct. 20", "20 October"], name: "names the offer deadline"}
+    - {check: includes, any: ["conflict", "contradict", "unclear", "not clear", "cannot tell", "can't tell", "cannot say", "does not say", "doesn't say", "no reason", "unknown"], name: "flags the conflict", level: soft}
+    - check: sentence_has
+      name: "one sentence says Rafael's own email (m-2008) does not decline the offer"
+      level: soft
+      all: ["\\b(Rafael|his|him|he)\\b", "(email|message|reply|replied|wrote|m-2008|2026-10-07|Oct(ober)? 7)", "(wonderful news|positive|sounded|(not|n't|never) (\\w+ )?(declin|refus|reject|turn(ed)? down)|did not say no)"]
+    - {check: includes_regex, pattern: "(likely|probably|possibly|may be|might be|appears to be|seems to be|could be) (a |an )?(data |recording |status )?(error|mistake|wrong|incorrect|stale)|status (is|may be|might be|looks) (likely |probably )?(wrong|incorrect|an error)", name: "says the rejected status is likely a data error", level: soft}
+    - check: sentence_has
+      name: "one sentence tells someone to contact or confirm with Rafael"
+      level: soft
+      all: ["\\b(contact|reach out|follow up|confirm|speak|talk|ask)\\b", "\\b(Rafael|him)\\b", "\\b(should|needs? to|must|recommend|please|ought|before)\\b"]
