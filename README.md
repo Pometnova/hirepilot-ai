@@ -121,6 +121,23 @@ the tool calls Claude asks for.
 
 The diagram is drawn from the real SQLite schema (SVG: `docs/images/data_model.svg`). To redraw both diagrams after a schema change: `.venv/bin/python scripts/make_diagrams.py` (add `--png` for the PNG files; needs `playwright`).
 
+## Data problems
+
+The audit found 19 problems. Full detail, with file and record ids: [docs/DATA_AUDIT.md](docs/DATA_AUDIT.md).
+Every cleaning decision is written there and stored in the `data_issues` table (62 rows after loading; 5 of them are unsubmitted scorecards, which mean "no feedback yet", so the web app counts 57 data issues: 34 fixed automatically, 7 for a recruiter to review, 16 left unchanged).
+
+| Problem | What we did |
+|---|---|
+| One person stored twice (Jonah Whitfield, c-105 and c-121) | Merged into one person; the tools show the other record |
+| Two different people with one name (both "Maya Chen") | Kept apart; links by name alone are not trusted |
+| Stage history disagrees with the application (a-114, a-116) | a-116: the end of its stage chain is used. a-114: the conflict is stored and shown |
+| Application a-113 has the wrong job | Treated as a backend application (author decision), recorded |
+| Mixed date formats in the stage history | Normalized; the rule is stored per row |
+| Scores on different scales, inside free text | Read with a pattern and turned into 0 to 1 |
+| Empty scorecards (5) | "No feedback yet", not negative |
+| Application a-201 is "rejected" at the Offer stage but has a future offer deadline | Left as in the source and flagged; the answer shows the conflict |
+| No tasks file, no role requirements, no due dates for most tasks | Tasks are built from the data; see assumptions and limitations |
+
 ## App
 
 Candidates (filters, flags, search, paging), Tasks, and Ask AI with a real agent answer to "Who are the top 3 candidates for Senior Backend Engineer, and why?":
@@ -192,23 +209,6 @@ cannot disagree. Tests cross-check the funnel, task, KPI and stalled numbers aga
 - **Conflicts are shown, not hidden.** Where two sources disagree, the answer says so.
 - **Answers are checked by rules.** A small style checker blocks internal ids, closing offers ("want me to...?")
   and "I did not check" in answers.
-
-## Data problems
-
-The audit found 19 problems. Full detail, with file and record ids: [docs/DATA_AUDIT.md](docs/DATA_AUDIT.md).
-Every cleaning decision is written there and stored in the `data_issues` table (62 rows after loading).
-
-| Problem | What we did |
-|---|---|
-| One person stored twice (Jonah Whitfield, c-105 and c-121) | Merged into one person; the tools show the other record |
-| Two different people with one name (both "Maya Chen") | Kept apart; links by name alone are not trusted |
-| Stage history disagrees with the application (a-114, a-116) | a-116: the end of its stage chain is used. a-114: the conflict is stored and shown |
-| Application a-113 has the wrong job | Treated as a backend application (author decision), recorded |
-| Mixed date formats in the stage history | Normalized; the rule is stored per row |
-| Scores on different scales, inside free text | Read with a pattern and turned into 0 to 1 |
-| Empty scorecards (5) | "No feedback yet", not negative |
-| Application a-201 is "rejected" at the Offer stage but has a future offer deadline | Left as in the source and flagged; the answer shows the conflict |
-| No tasks file, no role requirements, no due dates for most tasks | Tasks are built from the data; see assumptions and limitations |
 
 ## Assumptions
 
@@ -311,14 +311,7 @@ How the eval answers were verified:
     emails" and "I didn't pull Lucy Fairbanks' profile"); the q07/q14 double run passed 4 of 4 (q14 with 1 WARN each time).
 - **Weak spots in the checks:** a pass means the rules matched, not that the answer is right. Sentence checks look at words,
   not meaning. Answers differ from run to run, so one run is a sample, not a guarantee.
-- Unit and integration tests run without the API (a fake model replaces Claude). The real model was tried by hand in
-  the browser on the tasks question only.
-
-## Phase 8 candidates (not started)
-
-- Re-test rule 11 compliance (no "I did not check" when a tool could check), for example by running the full eval set again and
-  counting the style FAILs.
-- Add a find-candidate-by-name tool, so profile questions need fewer tool calls and cost less.
-- Add eval questions for the known data traps the evals do not cover now: a-113, a-114, s-250, mixed score scales (s-126).
-- Check how stable the model's reading of conflicting evidence is over more than four runs.
-- Task answers: show the interviewer's name for scorecard tasks, so two scorecards for one candidate don't look like a duplicate (e.g. s-208/s-209).
+- Unit and integration tests run without the API (a fake model replaces Claude). The real model was also tried by hand in
+  the web app: the three question buttons, a follow-up question, and questions about known data traps (a conflicting status,
+  a duplicate person, mixed score scales, a withdrawal reason) and a request to rank by age, which it refused. The Slack bot
+  ran once on a real workspace.
