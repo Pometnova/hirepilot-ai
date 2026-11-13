@@ -55,40 +55,6 @@ Fonts: Inter (regular, medium, semibold, bold; woff2, latin) is bundled in `asse
 The key lives only in `.env` (it is git-ignored). It is never printed or logged.
 The web app, the eval runner and `scripts/smoke_agent.py` are the only parts that call the Claude API.
 
-## Slack bot (demo)
-
-The bot is in `slack/bot.py`. It uses Slack Bolt in Socket Mode, so it needs no public web address. It calls the same agent as
-the web app (`core.ask_sync`) and contains no business logic.
-
-How it behaves:
-- An @mention in a channel, or a direct message, starts a thread. The bot always answers inside the thread.
-- It first posts "Working on it…", then replaces that message with the answer. A very long answer is split into more messages.
-- A reply in the same thread (an @mention again in a channel; no mention needed in a direct message) sends the earlier messages of
-  that thread to the agent as history, with the same cap as the web app (6 earlier question/answer pairs).
-- The answer is rewritten from markdown to Slack formatting. Tables go into a code block, because Slack has no tables.
-- The last line says which tools were used and the estimated cost, for example `Tools: get_funnel, list_jobs · est. cost $0.03`.
-- Errors are shown as short friendly messages. No traceback and no API key are ever sent. Logs hold counts only.
-
-**Who may use it.** Set `SLACK_ALLOWED_USER_IDS` in `.env` to a comma-separated list of Slack user ids (they look like `U01ABCDEF`).
-**If it is empty, everyone in the Slack workspace can use the bot, and every question costs money.** For the demo, put only your own id.
-To find your id in Slack: click your profile picture, open your profile, choose the three dots, then "Copy member ID".
-
-Create the Slack app (about 10 minutes, in the browser):
-1. Go to https://api.slack.com/apps, choose **Create New App**, then **Paste a manifest**. Pick your workspace, open the **YAML** tab,
-   delete the sample text in the field first (otherwise Slack creates a "Demo App" from its example), and paste the content of
-   `slack/manifest.yaml`.
-2. Under **Basic Information**, then **App-Level Tokens**, generate a token with the scope `connections:write`. Copy the `xapp-` token.
-3. Under **Install App**, install the app to the workspace. Copy the Bot User OAuth Token (`xoxb-`) shown after install.
-4. Copy your member ID: click your profile picture, open your profile, then **⋮ > Copy member ID**.
-5. Fill four variables in `.env`: `ANTHROPIC_API_KEY`, `SLACK_BOT_TOKEN` (the `xoxb-` token), `SLACK_APP_TOKEN` (the `xapp-` token)
-   and `SLACK_ALLOWED_USER_IDS` (your member ID).
-6. Run `.venv/bin/python -I slack/bot.py`. It prints how many users are on the allowlist.
-7. In Slack, open the app (under Apps) and send a direct message. For a channel, invite it with `/invite @HirePilot`, then mention it.
-
-Tokens go only in `.env`. Never put them in code, chat or git.
-
-The manifest asks only for these bot scopes: `app_mentions:read`, `chat:write`, `im:history`, `channels:history`, `groups:history`.
-
 ## Architecture
 
 ```
@@ -137,64 +103,6 @@ Every cleaning decision is written there and stored in the `data_issues` table (
 | Empty scorecards (5) | "No feedback yet", not negative |
 | Application a-201 is "rejected" at the Offer stage but has a future offer deadline | Left as in the source and flagged; the answer shows the conflict |
 | No tasks file, no role requirements, no due dates for most tasks | Tasks are built from the data; see assumptions and limitations |
-
-## App
-
-Candidates (filters, flags, search, paging), Tasks, and Ask AI with a real agent answer to "Who are the top 3 candidates for Senior Backend Engineer, and why?":
-
-![Candidates page](docs/images/candidates.png)
-
-![Tasks page](docs/images/tasks.png)
-
-![Ask AI: top candidates](docs/images/ask_ai_top_candidates.png)
-
-## Web app pages
-
-The sidebar has four pages: **Overview**, **Ask AI**, **Candidates**, **Tasks**. Every page shows the data date (15 Oct 2026) and a
-live "Connected / Disconnected" status. The status comes from starting the MCP server and listing its tools; it calls no AI model.
-
-**Overview** (free, no model call). Top section, next to the AI panel: four clickable KPI cards (overdue tasks, pending scorecards,
-unanswered emails, upcoming offer deadlines; a click opens the records, a second click closes them), then Open Positions (a click sets
-the role filter; the selected role has a coral bar and "Viewing: <role>" shows above the role charts) and Priority Actions (status
-conflicts first, then overdue, due today, pending, no due date). Full width below: Recruitment Funnel, Median Days in Stage and
-"Why candidates leave" (a donut: rejected / withdrew / unknown, from application status only, never from emails); "Data Health
-Check" (three coverage rings, each with one plain sentence, e.g. "42 of 44 candidates have a CV — 2 missing"); "Data Quality" (approved layout: issues found + high severity, a stacked bar fixed / need review / left unchanged with hover tooltips, three equal cards, "Issues Requiring Attention" with the unresolved issues, affected record, severity, source and the audit's own explanation, and an expander "View All Issues & Sources" with a grouped table, a table of every record, and resolution and severity filters; numbers come from `backend/services/trust.py`); Roles compared. Recent Activity and "Needs your decision" now live on the
-Candidates page.
-
-**Candidates** (free). Filter tabs (All, By Role, By Stage, With Flags, By Status), a coral banner with the number of flagged candidates and
-"View all flags", search by name, role or application id, a table of 10 rows per page with Status and Flags columns (flags come from rules in
-`trust.application_flags`) and Last update (newest dated record of the application). Right column: "Needs your decision" and Recent
-Activity. The Stalled candidates table stays below. The footer sits at the bottom of the window on short pages and after the content on
-long ones; the Ask AI page has no footer.
-
-**AI panel** (right of the Overview). Three tiles send the three assignment questions to the real agent (only when clicked). The panel
-shows a short summary of the latest answer: three rows (rank, name, score, stage, one risk flag) from the ranking tool result for Top
-Candidates, or the first paragraph of FACTS. "Read full answer" and "Open full chat" open the Ask AI page with the same stored answer
-(no new call). There are no cost labels anywhere in the app.
-
-**Ask AI** (the full answer). The same three buttons, horizontal. The layout depends on which question was asked (the button, or the tools
-the agent used), never on reading the answer text. Top candidates: three cards (rank, name, score, stage, rule-based risk flags such as
-"Offer deadline overdue" or "2 open tasks") and the "Interview & Progress Score" chart; drop-offs: funnel, median days and exits donut from
-the services; tasks: counts and the task table, most urgent first. Then AI ASSESSMENT, then collapsed expanders: Detailed evidence (FACTS),
-Data issues & assumptions (CAVEATS), Sources (N) (readable labels from a database lookup, grouped by candidate, raw reference in small
-text) and How this was calculated. Candidate names are bold and coloured. Every page ends with the same footer (normal flow, not fixed).
-
-**Rules that are not MCP tools** (`backend/services/trust.py`, tested against the raw files): *status conflict* = an offer deadline on a
-rejected or withdrawn application (flagged, never corrected); *exit* = rejected or withdrawn; *unknown exit* = rejected with no reason or a
-status conflict; *coverage* = people with a CV / with an email, and submitted scorecards, each out of its stated total. Source labels are in
-`backend/services/sources.py`.
-
-How the funnel is counted: the bar is the number of applications that reached the stage. The % at the right of a bar is the drop-off
-from the previous stage: (rejected + withdrew there) / reached there. Candidates still waiting at a stage are not lost, so they are
-not counted; the tooltip shows them as "still in progress". The stage with the largest drop-off is coral. The text under the chart is
-built in Python, not by the model.
-
-**Candidates** (with the stalled-candidates table and the status-conflict flag) and **Tasks** (with the tasks-by-state
-chart) are read-only tables with a role filter. Tables show every row; the page scrolls, not the table.
-
-All numbers come from `backend/services/analytics.py`, which only combines the existing services, so the Overview and the assistant
-cannot disagree. Tests cross-check the funnel, task, KPI and stalled numbers against the raw files.
-
 
 ## Key design decisions
 
@@ -253,6 +161,97 @@ is "due today". A task with no due date is "pending, no due date" and is never o
 - The rule-based flags (status conflict, score/text conflict) are computed in `backend/services` for the web UI and are **not exposed as an MCP tool**. The agent and Slack therefore do not list them with tasks; the agent finds them only when asked about a candidate. Next step: expose them as an MCP tool. The "est. cost" line in Slack answers is kept on purpose (it shows cost control).
 - In Slack, a follow-up in a channel thread needs a new @mention. Direct messages need no mention. Slack text is rewritten from
   markdown, so a very complex answer may look slightly different from the web app.
+
+## App
+
+Candidates (filters, flags, search, paging), Tasks, and Ask AI with a real agent answer to "Who are the top 3 candidates for Senior Backend Engineer, and why?":
+
+![Candidates page](docs/images/candidates.png)
+
+![Tasks page](docs/images/tasks.png)
+
+![Ask AI: top candidates](docs/images/ask_ai_top_candidates.png)
+
+## Web app pages
+
+The sidebar has four pages: **Overview**, **Ask AI**, **Candidates**, **Tasks**. Every page shows the data date (15 Oct 2026) and a
+live "Connected / Disconnected" status. The status comes from starting the MCP server and listing its tools; it calls no AI model.
+
+**Overview** (free, no model call). Top section, next to the AI panel: four clickable KPI cards (overdue tasks, pending scorecards,
+unanswered emails, upcoming offer deadlines; a click opens the records, a second click closes them), then Open Positions (a click sets
+the role filter; the selected role has a coral bar and "Viewing: <role>" shows above the role charts) and Priority Actions (status
+conflicts first, then overdue, due today, pending, no due date). Full width below: Recruitment Funnel, Median Days in Stage and
+"Why candidates leave" (a donut: rejected / withdrew / unknown, from application status only, never from emails); "Data Health
+Check" (three coverage rings, each with one plain sentence, e.g. "42 of 44 candidates have a CV — 2 missing"); "Data Quality" (approved layout: issues found + high severity, a stacked bar fixed / need review / left unchanged with hover tooltips, three equal cards, "Issues Requiring Attention" with the unresolved issues, affected record, severity, source and the audit's own explanation, and an expander "View All Issues & Sources" with a grouped table, a table of every record, and resolution and severity filters; numbers come from `backend/services/trust.py`); Roles compared. Recent Activity and "Needs your decision" now live on the
+Candidates page.
+
+**Candidates** (free). Filter tabs (All, By Role, By Stage, With Flags, By Status), a coral banner with the number of flagged candidates and
+"View all flags", search by name, role or application id, a table of 10 rows per page with Status and Flags columns (flags come from rules in
+`trust.application_flags`) and Last update (newest dated record of the application). Right column: "Needs your decision" and Recent
+Activity. The Stalled candidates table stays below. The footer sits at the bottom of the window on short pages and after the content on
+long ones; the Ask AI page has no footer.
+
+**AI panel** (right of the Overview). Three tiles send the three assignment questions to the real agent (only when clicked). The panel
+shows a short summary of the latest answer: three rows (rank, name, score, stage, one risk flag) from the ranking tool result for Top
+Candidates, or the first paragraph of FACTS. "Read full answer" and "Open full chat" open the Ask AI page with the same stored answer
+(no new call). There are no cost labels anywhere in the app.
+
+**Ask AI** (the full answer). The same three buttons, horizontal. The layout depends on which question was asked (the button, or the tools
+the agent used), never on reading the answer text. Top candidates: three cards (rank, name, score, stage, rule-based risk flags such as
+"Offer deadline overdue" or "2 open tasks") and the "Interview & Progress Score" chart; drop-offs: funnel, median days and exits donut from
+the services; tasks: counts and the task table, most urgent first. Then AI ASSESSMENT, then collapsed expanders: Detailed evidence (FACTS),
+Data issues & assumptions (CAVEATS), Sources (N) (readable labels from a database lookup, grouped by candidate, raw reference in small
+text) and How this was calculated. Candidate names are bold and coloured. Every page ends with the same footer (normal flow, not fixed).
+
+**Rules that are not MCP tools** (`backend/services/trust.py`, tested against the raw files): *status conflict* = an offer deadline on a
+rejected or withdrawn application (flagged, never corrected); *exit* = rejected or withdrawn; *unknown exit* = rejected with no reason or a
+status conflict; *coverage* = people with a CV / with an email, and submitted scorecards, each out of its stated total. Source labels are in
+`backend/services/sources.py`.
+
+How the funnel is counted: the bar is the number of applications that reached the stage. The % at the right of a bar is the drop-off
+from the previous stage: (rejected + withdrew there) / reached there. Candidates still waiting at a stage are not lost, so they are
+not counted; the tooltip shows them as "still in progress". The stage with the largest drop-off is coral. The text under the chart is
+built in Python, not by the model.
+
+**Candidates** (with the stalled-candidates table and the status-conflict flag) and **Tasks** (with the tasks-by-state
+chart) are read-only tables with a role filter. Tables show every row; the page scrolls, not the table.
+
+All numbers come from `backend/services/analytics.py`, which only combines the existing services, so the Overview and the assistant
+cannot disagree. Tests cross-check the funnel, task, KPI and stalled numbers against the raw files.
+
+## Slack bot (demo)
+
+The bot is in `slack/bot.py`. It uses Slack Bolt in Socket Mode, so it needs no public web address. It calls the same agent as
+the web app (`core.ask_sync`) and contains no business logic.
+
+How it behaves:
+- An @mention in a channel, or a direct message, starts a thread. The bot always answers inside the thread.
+- It first posts "Working on it…", then replaces that message with the answer. A very long answer is split into more messages.
+- A reply in the same thread (an @mention again in a channel; no mention needed in a direct message) sends the earlier messages of
+  that thread to the agent as history, with the same cap as the web app (6 earlier question/answer pairs).
+- The answer is rewritten from markdown to Slack formatting. Tables go into a code block, because Slack has no tables.
+- The last line says which tools were used and the estimated cost, for example `Tools: get_funnel, list_jobs · est. cost $0.03`.
+- Errors are shown as short friendly messages. No traceback and no API key are ever sent. Logs hold counts only.
+
+**Who may use it.** Set `SLACK_ALLOWED_USER_IDS` in `.env` to a comma-separated list of Slack user ids (they look like `U01ABCDEF`).
+**If it is empty, everyone in the Slack workspace can use the bot, and every question costs money.** For the demo, put only your own id.
+To find your id in Slack: click your profile picture, open your profile, choose the three dots, then "Copy member ID".
+
+Create the Slack app (about 10 minutes, in the browser):
+1. Go to https://api.slack.com/apps, choose **Create New App**, then **Paste a manifest**. Pick your workspace, open the **YAML** tab,
+   delete the sample text in the field first (otherwise Slack creates a "Demo App" from its example), and paste the content of
+   `slack/manifest.yaml`.
+2. Under **Basic Information**, then **App-Level Tokens**, generate a token with the scope `connections:write`. Copy the `xapp-` token.
+3. Under **Install App**, install the app to the workspace. Copy the Bot User OAuth Token (`xoxb-`) shown after install.
+4. Copy your member ID: click your profile picture, open your profile, then **⋮ > Copy member ID**.
+5. Fill four variables in `.env`: `ANTHROPIC_API_KEY`, `SLACK_BOT_TOKEN` (the `xoxb-` token), `SLACK_APP_TOKEN` (the `xapp-` token)
+   and `SLACK_ALLOWED_USER_IDS` (your member ID).
+6. Run `.venv/bin/python -I slack/bot.py`. It prints how many users are on the allowlist.
+7. In Slack, open the app (under Apps) and send a direct message. For a channel, invite it with `/invite @HirePilot`, then mention it.
+
+Tokens go only in `.env`. Never put them in code, chat or git.
+
+The manifest asks only for these bot scopes: `app_mentions:read`, `chat:write`, `im:history`, `channels:history`, `groups:history`.
 
 ## AI usage and verification
 
